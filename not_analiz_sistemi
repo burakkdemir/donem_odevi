@@ -1,0 +1,199 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import mysql.connector
+
+con = mysql.connector.connect(user='root', password='',
+                              host='localhost',
+                              database='ders')
+cursor=con.cursor()
+
+liste=[] 
+liste_Ad=[]
+listfin=[]
+listfinad=[]
+list2ad=[]
+list2vize=[]
+list2final=[]
+
+def göster():
+    cursor.execute("select ad,vize from universite")
+
+    data=cursor.fetchall()
+    
+
+    for i in range(len(data)):
+        liste_Ad.append(data[i][0])
+        liste.append(data[i][1])
+    print(liste)
+    print(liste_Ad)
+    con.commit()
+
+göster()    
+objects = (liste_Ad)
+incomes = (liste)
+y_post = np.arange(len(objects))
+plt.barh(y_post, incomes,align='center',alpha=1,color='b')
+plt.yticks(y_post,objects)
+plt.xlabel('Notlar')
+plt.ylabel('ögrenciler')
+plt.title('Vize notlari')
+plt.show()
+
+
+
+    
+def fingöster():
+    cursor.execute("select ad,final from universite")
+
+    data=cursor.fetchall()
+    
+
+    for i in range(len(data)):
+        listfinad.append(data[i][0])
+        listfin.append(data[i][1])
+    print(listfin)
+    print(listfinad)
+    con.commit()
+    
+    
+
+
+
+    
+
+
+fingöster()
+
+objects = (listfinad)
+incomes = (listfin)
+y_post = np.arange(len(objects))
+
+plt.barh(y_post, incomes,align='center',alpha=1,color='g')
+plt.yticks(y_post,objects)
+plt.xlabel('Notlar')
+plt.ylabel('ögrenciler')
+plt.title('Final notları')
+plt.show()
+
+
+def göster2():
+    cursor.execute("select ad,vize,final from universite")
+
+    data=cursor.fetchall()
+    
+
+    for i in range(len(data)):
+        list2ad.append(data[i][0])
+        list2vize.append(data[i][1])
+        list2final.append(data[i][2])
+    print(list2ad)
+    print(list2vize)
+    print(list2final)
+    con.commit()
+    con.close()
+    
+göster2()    
+
+
+n_groups =len(list2ad)
+vize = (list2vize)
+final = (list2final)
+ 
+fig, ax = plt.subplots()
+index = np.arange(n_groups)
+bar_width = 0.35
+opacity = 0.8
+ 
+rects1 = plt.bar(index,vize, bar_width,
+                 alpha=opacity,
+                 color='b',
+                 label='vize')
+ 
+rects2 = plt.bar(index + bar_width, final, bar_width,
+                 alpha=opacity,
+                 color='g',
+                 label='final')
+plt.xlabel('ogrenciler')
+plt.ylabel('Notlar')
+plt.title('Ogrenci Vize Final')
+plt.xticks(index + bar_width, (list2ad))
+plt.legend()
+plt.tight_layout()
+plt.xticks(rotation=60)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+vize=[]
+final=[]
+
+for i in liste:
+    if(i<40):
+        vize.append("düşük")
+    else:
+        vize.append("yüksek")
+for i in listfin:
+    if(i<40):
+        final.append("düşük")
+    else:
+        final.append("yüksek")
+gecme=[]
+i=0
+while(i<len(liste)):
+    i=i+1
+    gecme.append(((liste[i-1]*0.4)+(listfin[i-1])*0.6))
+
+gecme_durum=[]
+a=0
+while(a<len(gecme)):
+    a=a+1
+    if(gecme[a-1]>50):
+        gecme_durum.append("geçti")
+    else:
+        gecme_durum.append("kaldı")
+
+g=gecme_durum.count('geçti')
+k=gecme_durum.count("kaldı")
+
+
+labels = ('Geçti','Kaldı')
+sizes = [g,k]
+colors = ['green','red']
+plt.pie(sizes,labels=labels,colors=colors,autopct='%1.1f%%')
+plt.title('Öğrencilerin Geçme Durumu')
+plt.show()
+
+t=g+k
+k1=round((k*(100/t)))
+g1=round((g*(100/t)))
+print("öğrencilerin %",g1,"si dersten geçmiştir")
+print("öğrencilerin %",k1,"si dersten kalmıştır")
+
+
+tablo = {'ad': liste_Ad, 
+        'vize':liste,
+        'Vize_Durum': vize,   
+        'final': listfin, 
+        'final_durum':final,
+        'ortalama': gecme,
+        'gecme': gecme_durum,    
+            
+           }
+df = pd.DataFrame(tablo, columns = ['ad', 'vize', 'Vize_Durum', 'final', 'final_durum','ortalama','gecme'])
+df
+
+
+
+
+
+
+  
